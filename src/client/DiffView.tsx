@@ -63,9 +63,8 @@ function parseHunkHeader(line: string): { oldStart: number; newStart: number; he
  * Parse `git diff --no-color` output into file sections and hunks. Rows
  * outside a file section (leading noise) and metadata rows between the
  * `diff --git`/`---`/`+++` headers and the first hunk (index lines, mode
- * changes, rename/similarity lines) are skipped; a section that never
- * reaches a hunk (a mode/rename-only change) stays hunkless so the caller
- * can still draw its path.
+ * changes, similarity lines) are skipped; rename metadata supplies paths
+ * for rename-only changes that have no `---` / `+++` headers.
  */
 export function parseUnifiedDiff(text: string): ParsedDiff {
   const files: DiffFile[] = []
@@ -90,6 +89,14 @@ export function parseUnifiedDiff(text: string): ParsedDiff {
     if (raw.startsWith('Binary files ') || raw === 'GIT binary patch') {
       flushHunk()
       current.binary = true
+      continue
+    }
+    if (raw.startsWith('rename from ')) {
+      current.oldPath = raw.slice('rename from '.length)
+      continue
+    }
+    if (raw.startsWith('rename to ')) {
+      current.newPath = raw.slice('rename to '.length)
       continue
     }
     if (raw.startsWith('--- ')) {
