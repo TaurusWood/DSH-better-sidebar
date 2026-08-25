@@ -149,7 +149,9 @@ export function BrowserView(props: TabComponentProps) {
     setCursor(cursor - 1)
     setUrl(next)
     setInput(next)
+    setMessage(null)
     setReloadKey(key => key + 1)
+    persist(next)
   }
 
   const goForward = (): void => {
@@ -158,7 +160,9 @@ export function BrowserView(props: TabComponentProps) {
     setCursor(cursor + 1)
     setUrl(next)
     setInput(next)
+    setMessage(null)
     setReloadKey(key => key + 1)
+    persist(next)
   }
 
   return (
